@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_HOME" value="D:/BigData/applog/gmall" />
+    <property name="LOG_HOME" value="/opt/module/applog1/gmall" />
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%msg%n</pattern>
