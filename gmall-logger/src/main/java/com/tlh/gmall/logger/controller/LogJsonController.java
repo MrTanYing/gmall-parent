@@ -26,7 +26,7 @@ public class LogJsonController {
     public String applog(@RequestBody JSONObject jsonObject){
         String logJson = jsonObject.toJSONString();
         log.info(logJson);
-        if(jsonObject.getString("start")!=null){
+        if(jsonObject.getString("start")!=null && jsonObject.getString("start").length()>0){
             kafkaTemplate.send("GMALL_START",logJson);
         }else{
             kafkaTemplate.send("GMALL_EVENT",logJson);
