@@ -77,6 +77,7 @@
             <version>${spark.version}</version>
         </dependency>
 
+        <!--es jest-->
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
@@ -99,6 +100,13 @@
             <groupId>org.codehaus.janino</groupId>
             <artifactId>commons-compiler</artifactId>
             <version>2.7.8</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>2.4.6</version>
         </dependency>
 
         <dependency>
