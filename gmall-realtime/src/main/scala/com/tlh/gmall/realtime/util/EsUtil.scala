@@ -5,7 +5,7 @@ import java.util.Date
 
 import io.searchbox.client.config.HttpClientConfig
 import io.searchbox.client.{JestClient, JestClientFactory}
-import io.searchbox.core.{Index, Search, SearchResult}
+import io.searchbox.core.{Bulk, BulkResult, Index, Search, SearchResult}
 import org.elasticsearch.index.query.{BoolQueryBuilder, MatchQueryBuilder, RangeQueryBuilder}
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.elasticsearch.search.highlight.HighlightBuilder
@@ -24,7 +24,7 @@ object EsUtil {
 
     private var jestClientFactory : JestClientFactory = null;
 
-    def getJestClient:JestClient = {
+    def getJestClient():JestClient = {
         if(jestClientFactory==null) build()
         jestClientFactory.getObject
     }
@@ -79,6 +79,26 @@ object EsUtil {
         }
         println(resultList.asScala.mkString("\n"))
         jest.close()
+
+    }
+
+    //批次化操作  batch   Bulk
+    def bulkSave(list: List[(Any, String)], indexName: String): Unit = {
+        if (list != null && list.size > 0) {
+            val jestClient: JestClient = getJestClient
+            val bulkBuilder = new Bulk.Builder
+            bulkBuilder.defaultIndex(indexName).defaultType("_doc")
+            for ((doc, id) <- list) {
+                //如果给id指定id 幂等性（保证精确一次消费的必要条件） //不指定id 随机生成 非幂等性
+                val index = new Index.Builder(doc).id(id).build()
+                bulkBuilder.addAction(index)
+            }
+            val bulk: Bulk = bulkBuilder.build()
+            val items: java.util.List[BulkResult#BulkResultItem] = jestClient.execute(bulk).getItems
+            println("已保存" + items.size())
+
+            jestClient.close()
+        }
 
     }
 
