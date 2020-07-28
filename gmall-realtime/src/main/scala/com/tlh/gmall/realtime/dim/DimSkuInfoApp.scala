@@ -18,6 +18,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
  * @Version 1.0
  */
 object DimSkuInfoApp {
+
     def main(args: Array[String]): Unit = {
         /**
          *1.mysql --maxwell-->
