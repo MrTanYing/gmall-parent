@@ -18,5 +18,6 @@ case class SkuInfo(
                     tm_id:Long,
                     category3_id:Long,
                     sku_default_img:String,
+                  //todo
                     create_time:Date
                   )

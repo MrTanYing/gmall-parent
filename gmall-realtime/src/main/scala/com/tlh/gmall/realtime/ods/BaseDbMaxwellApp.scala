@@ -67,8 +67,7 @@ object BaseDbMaxwellApp {
                 val topicName = "ODS_" + tableName.toUpperCase
                 // val dataArr: JSONArray = jsonObj.getJSONArray("data")
                 val json: String = jsonObj.getString("data")
-                        println(s"tableName = ${tableName}")
-                        println(s"optType = ${optType}")
+                println(s"tableName = ${tableName}",s"optType = ${optType}")
                 if (json != null && json.length > 3) {
                     if ((tableName.equals("order_info") && optType.equals("insert"))
                       || (tableName.equals("order_detail") && optType.equals("insert"))

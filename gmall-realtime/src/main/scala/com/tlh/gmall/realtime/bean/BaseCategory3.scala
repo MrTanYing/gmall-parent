@@ -6,7 +6,7 @@ package com.tlh.gmall.realtime.bean
  * @Date 2020/7/29 21:34
  * @Version 1.0
  */
-case class Category3Info(
+case class BaseCategory3(
                         id: String,
                         name: String
                         )

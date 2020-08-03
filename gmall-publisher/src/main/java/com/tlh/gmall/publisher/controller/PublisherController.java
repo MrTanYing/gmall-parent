@@ -2,12 +2,15 @@ package com.tlh.gmall.publisher.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.tlh.gmall.publisher.service.DauService;
+import com.tlh.gmall.publisher.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -19,9 +22,12 @@ import java.util.*;
  * @Version 1.0
  */
 @RestController
+@Slf4j
 public class PublisherController {
     @Autowired
     private DauService dauService;
+    @Autowired
+    private OrderService orderService;
 
     @RequestMapping("realtime-total")
     public String realtimeTotal(@RequestParam("date") String date){
@@ -29,7 +35,13 @@ public class PublisherController {
         HashMap dauMap = new HashMap();
         dauMap.put("id","dau");
         dauMap.put("name","新增日活");
-        Long dauTotal = dauService.getDauTotal(date);
+        Long dauTotal = 0L;
+        try {
+            dauTotal = dauService.getDauTotal(date);
+        }catch (Exception e){
+            log.error("ES 服务错误！！");
+        }
+
         dauMap.put("value",dauTotal);
         totalList.add(dauMap);
 
@@ -39,7 +51,14 @@ public class PublisherController {
         dauMap.put("value","233");
         totalList.add(newMidMap);
 
-        return JSON.toJSONString(totalList);
+        Map orderAmountMap=new HashMap();
+        orderAmountMap.put("id","order_amount");
+        orderAmountMap.put("name","新增交易额");
+        BigDecimal orderTotalAmount = orderService.getOrderTotalAmount(date);
+        orderAmountMap.put("value",orderTotalAmount );
+        totalList.add(orderAmountMap);
+
+        return   JSON.toJSONString(totalList) ;
     }
 
     @RequestMapping("realtime-hour")
@@ -54,7 +73,16 @@ public class PublisherController {
             hourCountMap.put("yesterday",dauHourCountYesterdayMap);
             hourCountMap.put("today",dauHourCountTodayMap);
             return  JSON.toJSONString(hourCountMap);
-        }
+        } else if("order_amount".equals(id)){
+                Map orderAmountTDMap = orderService.getOrderHourAmount(date);
+                String yd = getYd(date);
+                Map orderAmountYDMap = orderService.getOrderHourAmount(yd);
+
+                Map<String,Map<String,Long>> hourAmountMap=new HashMap<>();
+                hourAmountMap.put("yesterday",orderAmountYDMap);
+                hourAmountMap.put("today",orderAmountTDMap);
+                return  JSON.toJSONString(hourAmountMap);
+            }
         return null;
 
     }
@@ -66,7 +94,6 @@ public class PublisherController {
             Date tdDate = simpleDateFormat.parse(td);
             Date ydDate = DateUtils.addDays(tdDate, -1);
             return   simpleDateFormat.format(ydDate);
-
         } catch (ParseException e) {
             throw new RuntimeException("格式转换有误");
         }
